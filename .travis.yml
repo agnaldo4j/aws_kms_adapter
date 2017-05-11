@@ -3,4 +3,4 @@ language: scala
 scala:
   - 2.12.2
 
-script: "clean coverage test coverageReport coverageAggregate"
+script: "sbt clean coverage test coverageReport coverageAggregate"
