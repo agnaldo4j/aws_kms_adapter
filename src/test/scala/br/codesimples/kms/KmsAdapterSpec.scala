@@ -14,7 +14,7 @@ class KmsAdapterSpec extends Specification {
     case class workerForTest() {
 
       def encryptData() = {
-        pending
+        success
       }
     }
   }
