@@ -11,7 +11,6 @@ scalaVersion := "2.12.2"
 resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases"
 
 lazy val root:Project = Project(id = "root", base = file(".")).
-    settings(sbtassembly.Plugin.assemblySettings: _*).
     settings(
         Dependencies.basicConfig: _*
     ).
