@@ -10,10 +10,6 @@ object Dependencies {
   )
 
   lazy val basicConfig = Seq(
-    organization := "CodeSimples",
-
-    scalaVersion := "2.12.2",
-
     scalacOptions in Test ++= Seq("-Yrangepos"),
 
     parallelExecution in Test := false,

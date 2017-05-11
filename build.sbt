@@ -2,9 +2,9 @@ import sbt._
 
 name := "aws_kms_adapter"
 
-organization := "CodeSimples"
+organization := "br.com.codesimples"
 
-version := "0.2"
+version := "0.3"
 
 scalaVersion := "2.12.2"
 
