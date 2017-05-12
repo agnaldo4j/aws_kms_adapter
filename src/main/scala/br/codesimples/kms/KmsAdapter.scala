@@ -9,17 +9,17 @@ import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 import scala.collection.JavaConverters._
 
 object KmsAdapter {
-  val EXECUTOR_SERVICE = Executors.newCachedThreadPool()
+  val executorService = Executors.newCachedThreadPool()
 
   def newWithEnvironmentVariables(): KmsAdapter = {
     val keyArn = System.getenv("keyArn")
     val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
-    KmsAdapter(new AwsCrypto(), provider, EXECUTOR_SERVICE)
+    KmsAdapter(new AwsCrypto(), provider, executorService)
   }
 }
 
 case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executorService: ExecutorService) {
-  val TIME_IN_SECONDS = TimeUnit.SECONDS.toSeconds(30)
+  val timeInSeconds = TimeUnit.SECONDS.toSeconds(30)
 
   def crypt(dataPacket: DataPacket): DataPacketResult = {
     val listOfActions = dataPacket.values.map {
@@ -51,7 +51,7 @@ case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executo
   private def invokeAll(listOfActions: java.util.List[Callable[Result]]): List[Future[Result]] = {
     executorService.invokeAll(
       listOfActions,
-      TIME_IN_SECONDS,
+      timeInSeconds,
       TimeUnit.SECONDS
     ).asScala.toList
   }

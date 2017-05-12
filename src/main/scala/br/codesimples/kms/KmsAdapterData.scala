@@ -24,7 +24,7 @@ case class FailResult() extends Result {
   override def isFailure: Boolean = true
 }
 
-case class DataPacket(values:List[Data]) {}
+case class DataPacket(values:List[Data])
 
 case class DataPacketResult(values:List[Result])
 
