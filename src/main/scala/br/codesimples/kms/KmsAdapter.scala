@@ -14,41 +14,45 @@ object KmsAdapter {
   def newWithEnvironmentVariables(): KmsAdapter = {
     val keyArn = System.getenv("keyArn")
     val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
-
     KmsAdapter(new AwsCrypto(), provider, EXECUTOR_SERVICE)
   }
 }
 
 case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executorService: ExecutorService) {
+  val TIME_IN_SECONDS = TimeUnit.SECONDS.toSeconds(30)
 
   def crypt(dataPacket: DataPacket): DataPacketResult = {
-
-    val listOfValues = dataPacket.values.map { value =>
-      val result = crypto.encryptString(provider, value.value).getResult
-      SuccessResult(value.attribute, result)
-    }
-    DataPacketResult(listOfValues)
+    val listOfActions = dataPacket.values.map {
+      data => EncryptAction(crypto, provider, data).asInstanceOf[Callable[Result]]
+    }.asJava
+    executeActions(listOfActions)
   }
 
   def decrypt(dataPacket: DataPacket): DataPacketResult = {
-    val listOfActions = dataPacket.values.map { data => DecryptAction(crypto, provider, data) }.asJava
-    val listOfFutures =  invokeAllDecryptActions(listOfActions)
+    val listOfActions = dataPacket.values.map {
+      data => DecryptAction(crypto, provider, data).asInstanceOf[Callable[Result]]
+    }.asJava
+    executeActions(listOfActions)
+  }
 
-    val listOfResults = listOfFutures.map{ future =>
+  private def executeActions(listOfActions: java.util.List[Callable[Result]]): DataPacketResult = {
+    val listOfFutures =  invokeAll(listOfActions)
+    val listOfResults = processFutures(listOfFutures)
+    DataPacketResult(listOfResults)
+  }
+
+  private def processFutures(listOfFutures:List[Future[Result]]): List[Result] = {
+    listOfFutures.map{ future =>
       if (future.isDone) future.get()
       else FailResult
-    }
-    DataPacketResult(listOfResults.asInstanceOf[List[Result]])
+    }.asInstanceOf[List[Result]]
   }
 
-  private def invokeAllDecryptActions(listOfActions: java.util.List[DecryptAction]): List[Future[Result]] = {
-    executorService.invokeAll(listOfActions, TimeUnit.SECONDS.toSeconds(30), TimeUnit.SECONDS).asScala.toList
-  }
-}
-
-case class DecryptAction(crypto: AwsCrypto, provider: KmsMasterKeyProvider, data: Data) extends Callable[Result] {
-  override def call(): Result = {
-    val result = crypto.decryptString(provider, data.value).getResult
-    SuccessResult(data.attribute, result)
+  private def invokeAll(listOfActions: java.util.List[Callable[Result]]): List[Future[Result]] = {
+    executorService.invokeAll(
+      listOfActions,
+      TIME_IN_SECONDS,
+      TimeUnit.SECONDS
+    ).asScala.toList
   }
 }

@@ -15,7 +15,10 @@ class KmsAdapterSpec extends Specification {
   private def toCryptDataPacket(): DataPacket = {
     DataPacket(
       List[Data](
-        Data("name", "Agnaldo de Oliveira")
+        Data("name", "Agnaldo de Oliveira"),
+        Data("email", "teste@teste.com"),
+        Data("phone", "111111111111"),
+        Data("valor", "10.20")
       )
     )
   }
@@ -36,7 +39,7 @@ class KmsAdapterSpec extends Specification {
       val adapter = KmsAdapter.newWithEnvironmentVariables()
       val result = adapter.crypt( toCryptDataPacket() )
       val listOfValues = result.values
-      listOfValues.size must be equalTo(1)
+      listOfValues.size must be equalTo(4)
       val value = listOfValues(0)
       value.attribute must be equalTo("name")
       value.value.length must be greaterThan(20)
