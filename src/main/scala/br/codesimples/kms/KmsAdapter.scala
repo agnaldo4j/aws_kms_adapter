@@ -6,7 +6,6 @@ import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
 import com.amazonaws.encryptionsdk.AwsCrypto
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 
-import scala.collection.JavaConverters
 import scala.collection.JavaConverters._
 
 object KmsAdapter {
