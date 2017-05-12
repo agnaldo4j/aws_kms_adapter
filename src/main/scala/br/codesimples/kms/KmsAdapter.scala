@@ -5,25 +5,29 @@ import com.amazonaws.encryptionsdk.AwsCrypto
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 
 object KmsAdapter {
-  def main(args: Array[String]): Unit = {
-    val crypto = new AwsCrypto()
+  def newWithEnvironmentVariables(): KmsAdapter = {
     val keyArn = System.getenv("keyArn")
-
-    val credentials = new EnvironmentVariableCredentialsProvider()
-    val prov = new KmsMasterKeyProvider(credentials, keyArn)
-
-    val ciphertext = crypto.encryptString(prov, "Teste de um texto pequeno para ficar vendo o tamanho do problema").getResult
-    System.out.println("Ciphertext: " + ciphertext)
-
-    val decryptResult = crypto.decryptString(prov, ciphertext)
-    if (!(decryptResult.getMasterKeyIds.get(0) == keyArn)) throw new IllegalStateException("Wrong key id!")
-
-    System.out.println("Decrypted: " + decryptResult.getResult)
+    val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
+    KmsAdapter(new AwsCrypto(), provider)
   }
 }
 
-class KmsAdapter {
-  def crypt() {}
+case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider) {
 
-  def decrypt {}
+  def crypt(dataPacket: DataPacket): DataPacketResult = {
+    val listOfValues = dataPacket.values.map { value =>
+      val result = crypto.encryptString(provider, value.value).getResult
+      Value(value.attribute, result)
+    }
+    DataPacketResult(listOfValues)
+  }
+
+  def decrypt(dataPacket: DataPacket): DataPacketResult = {
+    val listOfValues = dataPacket.values.map { value =>
+      val result = crypto.decryptString(provider, value.value).getResult
+      Value(value.attribute, result)
+    }
+    DataPacketResult(listOfValues)
+  }
+
 }

@@ -1,5 +1,9 @@
 package br.codesimples.kms
 
-case class Value(value:String)
+case class Value(attribute:String, value:String)
 
 case class DataPacket(values:List[Value])
+
+case class DataPacketResult(values:List[Value])
+
+case class KmsAdapterConfig()
