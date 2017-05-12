@@ -28,4 +28,10 @@ lazy val root:Project = Project(id = "root", base = file(".")).
     ).
     settings(
         Dependencies.basicLibraries: _*
+    ).
+    settings(
+      Dependencies.bouncycastleLibraries: _*
+    ).
+    settings(
+      Dependencies.awsEncryptionSdkLibraries: _*
     ).dependsOn()
