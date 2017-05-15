@@ -11,9 +11,9 @@ trait Result {
   def isFailure: Boolean
 }
 
-case class Data(attribute:String, value:String)
+case class Data(attribute: String, value: String)
 
-case class SuccessResult(attribute:String, value:String) extends Result {
+case class SuccessResult(attribute: String, value: String) extends Result {
   override def isFailure: Boolean = false
 }
 
@@ -24,9 +24,13 @@ case class FailResult() extends Result {
   override def isFailure: Boolean = true
 }
 
-case class DataPacket(values:List[Data])
+case class DataPacket(values: List[Data]) {
+  def addData(data:Data): DataPacket = {
+    DataPacket( values ++ List[Data](data) )
+  }
+}
 
-case class DataPacketResult(values:List[Result])
+case class DataPacketResult(values: List[Result])
 
 case class DecryptAction(crypto: AwsCrypto, provider: KmsMasterKeyProvider, data: Data) extends Callable[Result] {
   override def call(): Result = {
