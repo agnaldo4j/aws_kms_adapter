@@ -37,7 +37,7 @@ object KmsAdapter {
 case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executorService: ExecutorService) {
   val timeInSeconds = TimeUnit.SECONDS.toSeconds(30)
 
-  def crypt(dataPacket: DataPacket): DataPacketResult = {
+  def encrypt(dataPacket: DataPacket): DataPacketResult = {
     val listOfActions = dataPacket.values.map {
       data => EncryptAction(crypto, provider, data).asInstanceOf[Callable[Result]]
     }.asJava

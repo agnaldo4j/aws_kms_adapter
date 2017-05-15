@@ -8,7 +8,7 @@ class KmsAdapterSpec extends Specification {
   sequential
   "The kms adapter showd" should {
     args(sequential=true, isolated=true)
-    "crypt data" ! workerForTest().cryptData()
+    "crypt data" ! workerForTest().encryptData()
     "decrypt data" ! workerForTest().decryptData()
   }
 
@@ -31,9 +31,9 @@ class KmsAdapterSpec extends Specification {
   }
 
   case class workerForTest() {
-    def cryptData() = {
+    def encryptData() = {
       val adapter = KmsAdapterFromEnvironmentVariables.kmsAdapter()
-      val result = adapter.crypt( toCryptDataPacket() )
+      val result = adapter.encrypt( toCryptDataPacket() )
       val listOfValues = result.values
       listOfValues.size must be equalTo(4)
       val value = listOfValues(0)
