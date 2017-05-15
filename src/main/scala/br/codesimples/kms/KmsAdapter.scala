@@ -9,14 +9,19 @@ import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 import scala.collection.JavaConverters._
 
 object KmsAdapter {
-  val executorService = Executors.newCachedThreadPool()
+  private val executorService = Executors.newCachedThreadPool()
+  private val keyArn = System.getenv("keyArn")
+  private val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
+  private val kmsAdapter = KmsAdapter(new AwsCrypto(), provider, executorService)
 
-  def newWithEnvironmentVariables(): KmsAdapter = {
-    val keyArn = System.getenv("keyArn")
-    val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
-    KmsAdapter(new AwsCrypto(), provider, executorService)
-  }
+  def withEnvironmentVariables(): KmsAdapter = kmsAdapter
+
+  def prepareDataPackageWith(list:List[Data]): DataPacket = DataPacket(list)
+
+  def prepareDataPackageWith(data: Data): DataPacket = DataPacket(List[Data](data))
 }
+
+
 
 case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executorService: ExecutorService) {
   val timeInSeconds = TimeUnit.SECONDS.toSeconds(30)
@@ -36,13 +41,13 @@ case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executo
   }
 
   private def executeActions(listOfActions: java.util.List[Callable[Result]]): DataPacketResult = {
-    val listOfFutures =  invokeAll(listOfActions)
+    val listOfFutures = invokeAll(listOfActions)
     val listOfResults = processFutures(listOfFutures)
     DataPacketResult(listOfResults)
   }
 
-  private def processFutures(listOfFutures:List[Future[Result]]): List[Result] = {
-    listOfFutures.map{ future =>
+  private def processFutures(listOfFutures: List[Future[Result]]): List[Result] = {
+    listOfFutures.map { future =>
       if (future.isDone) future.get()
       else FailResult
     }.asInstanceOf[List[Result]]

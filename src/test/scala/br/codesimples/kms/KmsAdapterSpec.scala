@@ -13,7 +13,8 @@ class KmsAdapterSpec extends Specification {
   }
 
   private def toCryptDataPacket(): DataPacket = {
-    DataPacket(
+
+    KmsAdapter.prepareDataPackageWith(
       List[Data](
         Data("name", "Agnaldo de Oliveira"),
         Data("email", "teste@teste.com"),
@@ -24,7 +25,7 @@ class KmsAdapterSpec extends Specification {
   }
 
   private def toDecryptDataPacket(): DataPacket = {
-    DataPacket(
+    KmsAdapter.prepareDataPackageWith(
       List[Data](
         Data(
           "name",
@@ -36,7 +37,7 @@ class KmsAdapterSpec extends Specification {
 
   case class workerForTest() {
     def cryptData() = {
-      val adapter = KmsAdapter.newWithEnvironmentVariables()
+      val adapter = KmsAdapter.withEnvironmentVariables()
       val result = adapter.crypt( toCryptDataPacket() )
       val listOfValues = result.values
       listOfValues.size must be equalTo(4)
@@ -46,7 +47,7 @@ class KmsAdapterSpec extends Specification {
     }
 
     def decryptData() = {
-      val adapter = KmsAdapter.newWithEnvironmentVariables()
+      val adapter = KmsAdapter.withEnvironmentVariables()
       val result = adapter.decrypt( toDecryptDataPacket() )
       val listOfValues = result.values
       listOfValues.size must be equalTo(1)
