@@ -25,27 +25,27 @@ case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executo
     val listOfActions = dataPacket.values.map {
       data => EncryptAction(crypto, provider, data).asInstanceOf[Callable[Result]]
     }.asJava
-    executeActions(listOfActions)
+    executeActions(listOfActions, Encrypt())
   }
 
   def decrypt(dataPacket: DataPacket): DataPacketResult = {
     val listOfActions = dataPacket.values.map {
       data => DecryptAction(crypto, provider, data).asInstanceOf[Callable[Result]]
     }.asJava
-    executeActions(listOfActions)
+    executeActions(listOfActions, Decrypt())
   }
 
-  private def executeActions(listOfActions: java.util.List[Callable[Result]]): DataPacketResult = {
+  private def executeActions(listOfActions: java.util.List[Callable[Result]], operation: Operation): DataPacketResult = {
     val listOfFutures = invokeAll(listOfActions)
-    val listOfResults = processFutures(listOfFutures)
+    val listOfResults = processFutures(listOfFutures, operation)
     DataPacketResult(listOfResults)
   }
 
-  private def processFutures(listOfFutures: List[Future[Result]]): List[Result] = {
+  private def processFutures(listOfFutures: List[Future[Result]], operation: Operation): List[Result] = {
     listOfFutures.map { future =>
-      if (future.isDone) future.get()
-      else FailResult
-    }.asInstanceOf[List[Result]]
+      if (future.isCancelled) FailResult(operation)
+      else future.get
+    }
   }
 
   private def invokeAll(listOfActions: java.util.List[Callable[Result]]): List[Future[Result]] = {

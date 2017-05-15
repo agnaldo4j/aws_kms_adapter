@@ -39,6 +39,7 @@ class KmsAdapterSpec extends Specification {
       val value = listOfValues(0)
       value.attribute must be equalTo("name")
       value.value.length must be greaterThan(20)
+      value.operation must be equalTo(Encrypt())
     }
 
     def decryptData() = {
@@ -49,6 +50,7 @@ class KmsAdapterSpec extends Specification {
       val value = listOfValues(0)
       value.attribute must be equalTo("name")
       value.value must be equalTo("Agnaldo de Oliveira")
+      value.operation must be equalTo(Decrypt())
     }
   }
 }
