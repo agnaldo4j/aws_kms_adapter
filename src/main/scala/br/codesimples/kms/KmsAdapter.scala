@@ -8,14 +8,20 @@ import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 
 import scala.collection.JavaConverters._
 
-object KmsAdapter {
+object KmsAdapterFromEnvironmentVariables {
   private val executorService = Executors.newCachedThreadPool()
+  private val keyArn = System.getenv("keyArn")
+  private val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
 
-  def withEnvironmentVariables(): KmsAdapter = {
-    val keyArn = System.getenv("keyArn")
-    val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
+  def kmsAdapter(): KmsAdapter = {
     KmsAdapter(new AwsCrypto(), provider, executorService)
   }
+
+  def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
+}
+
+object KmsAdapterFromVariables {
+  private val executorService = Executors.newCachedThreadPool()
 
   def withValues(keyArn: String, accessKey:String, secretKey:String): KmsAdapter = {
     val provider = new KmsMasterKeyProvider(new BasicAWSCredentials(accessKey, secretKey), keyArn)
