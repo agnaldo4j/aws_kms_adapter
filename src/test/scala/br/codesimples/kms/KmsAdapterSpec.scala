@@ -13,7 +13,7 @@ class KmsAdapterSpec extends Specification {
   }
 
   private def toCryptDataPacket(): DataPacket = {
-    KmsAdapterFromEnvironmentVariables.
+    KmsAdapter.
       prepareDataPackage().
       addData("name", "Agnaldo de Oliveira").
       addData("email", "teste@teste.com").
@@ -22,7 +22,7 @@ class KmsAdapterSpec extends Specification {
   }
 
   private def toDecryptDataPacket(): DataPacket = {
-    KmsAdapterFromEnvironmentVariables.
+    KmsAdapter.
       prepareDataPackage().
       addData(
         "name",
