@@ -2,7 +2,7 @@ package br.codesimples.kms
 
 import java.util.concurrent._
 
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider
+import com.amazonaws.auth.{BasicAWSCredentials, EnvironmentVariableCredentialsProvider}
 import com.amazonaws.encryptionsdk.AwsCrypto
 import com.amazonaws.encryptionsdk.kms.KmsMasterKeyProvider
 
@@ -10,10 +10,17 @@ import scala.collection.JavaConverters._
 
 object KmsAdapter {
   private val executorService = Executors.newCachedThreadPool()
-  private val keyArn = System.getenv("keyArn")
-  private val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
 
-  def withEnvironmentVariables(): KmsAdapter = KmsAdapter(new AwsCrypto(), provider, executorService)
+  def withEnvironmentVariables(): KmsAdapter = {
+    val keyArn = System.getenv("keyArn")
+    val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
+    KmsAdapter(new AwsCrypto(), provider, executorService)
+  }
+
+  def withValues(keyArn: String, accessKey:String, secretKey:String): KmsAdapter = {
+    val provider = new KmsMasterKeyProvider(new BasicAWSCredentials(accessKey, secretKey), keyArn)
+    KmsAdapter(new AwsCrypto(), provider, executorService)
+  }
 
   def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
 }
