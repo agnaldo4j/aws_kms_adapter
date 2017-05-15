@@ -25,8 +25,8 @@ case class FailResult() extends Result {
 }
 
 case class DataPacket(values: List[Data]) {
-  def addData(data:Data): DataPacket = {
-    DataPacket( values ++ List[Data](data) )
+  def addData(attribute:String, value: String): DataPacket = {
+    DataPacket( values ++ List[Data]( Data(attribute, value)) )
   }
 }
 
