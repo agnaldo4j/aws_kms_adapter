@@ -12,7 +12,13 @@ class KmsAdapterSpec extends Specification {
     "decrypt data" ! workerForTest().decryptData()
   }
 
-  private def toCryptDataPacket(): DataPacket = {
+  private def isByEnvironmentVariables: Boolean = {
+    (System.getenv("keyArn") != null) &&
+    (System.getenv("AWS_ACCESS_KEY_ID") != null) &&
+    (System.getenv("AWS_SECRET_KEY") != null)
+  }
+
+  private def toCryptDataPacket() = {
     KmsAdapter.
       prepareDataPackage().
       addData("name", "Agnaldo de Oliveira").
@@ -32,25 +38,27 @@ class KmsAdapterSpec extends Specification {
 
   case class workerForTest() {
     def encryptData() = {
+      if(isByEnvironmentVariables) pending
       val adapter = KmsAdapterFromEnvironmentVariables.kmsAdapter()
-      val result = adapter.encrypt( toCryptDataPacket() )
+      val result = adapter.encrypt(toCryptDataPacket())
       val listOfValues = result.values
-      listOfValues.size must be equalTo(4)
+      listOfValues.size must be equalTo (4)
       val value = listOfValues(0)
-      value.attribute must be equalTo("name")
-      value.value.length must be greaterThan(20)
-      value.operation must be equalTo(Encrypt())
+      value.attribute must be equalTo ("name")
+      value.value.length must be greaterThan (20)
+      value.operation must be equalTo (Encrypt())
     }
 
     def decryptData() = {
+      if(isByEnvironmentVariables) pending
       val adapter = KmsAdapterFromEnvironmentVariables.kmsAdapter()
-      val result = adapter.decrypt( toDecryptDataPacket() )
+      val result = adapter.decrypt(toDecryptDataPacket())
       val listOfValues = result.values
-      listOfValues.size must be equalTo(1)
+      listOfValues.size must be equalTo (1)
       val value = listOfValues(0)
-      value.attribute must be equalTo("name")
-      value.value must be equalTo("Agnaldo de Oliveira")
-      value.operation must be equalTo(Decrypt())
+      value.attribute must be equalTo ("name")
+      value.value must be equalTo ("Agnaldo de Oliveira")
+      value.operation must be equalTo (Decrypt())
     }
   }
 }
