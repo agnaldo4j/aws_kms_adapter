@@ -23,8 +23,11 @@ object KmsAdapterFromEnvironmentVariables {
 object KmsAdapterFromVariables {
   private val executorService = Executors.newCachedThreadPool()
 
-  def withValues(keyArn: String, accessKey:String, secretKey:String): KmsAdapter = {
-    val provider = new KmsMasterKeyProvider(new BasicAWSCredentials(accessKey, secretKey), keyArn)
+  def buildProvider(keyArn: String, accessKey:String, secretKey:String): KmsMasterKeyProvider = {
+    new KmsMasterKeyProvider(new BasicAWSCredentials(accessKey, secretKey), keyArn)
+  }
+
+  def kmsAdapter(provider: KmsMasterKeyProvider): KmsAdapter = {
     KmsAdapter(new AwsCrypto(), provider, executorService)
   }
 
