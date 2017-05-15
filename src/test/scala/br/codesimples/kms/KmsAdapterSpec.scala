@@ -12,8 +12,8 @@ class KmsAdapterSpec extends Specification {
       "crypt data" ! workerForTest().encryptData()
       "decrypt data" ! workerForTest().decryptData()
     } else {
-      "crypt data" ! pending
-      "decrypt data" ! pending
+      "crypt data" ! success
+      "decrypt data" ! success
     }
   }
 
