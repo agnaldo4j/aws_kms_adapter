@@ -12,9 +12,8 @@ object KmsAdapter {
   private val executorService = Executors.newCachedThreadPool()
   private val keyArn = System.getenv("keyArn")
   private val provider = new KmsMasterKeyProvider(new EnvironmentVariableCredentialsProvider(), keyArn)
-  private val kmsAdapter = KmsAdapter(new AwsCrypto(), provider, executorService)
 
-  def withEnvironmentVariables(): KmsAdapter = kmsAdapter
+  def withEnvironmentVariables(): KmsAdapter = KmsAdapter(new AwsCrypto(), provider, executorService)
 
   def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
 }
