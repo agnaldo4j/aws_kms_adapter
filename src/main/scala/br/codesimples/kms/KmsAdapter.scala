@@ -16,12 +16,8 @@ object KmsAdapter {
 
   def withEnvironmentVariables(): KmsAdapter = kmsAdapter
 
-  def prepareDataPackageWith(list:List[Data]): DataPacket = DataPacket(list)
-
-  def prepareDataPackageWith(data: Data): DataPacket = DataPacket(List[Data](data))
+  def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
 }
-
-
 
 case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executorService: ExecutorService) {
   val timeInSeconds = TimeUnit.SECONDS.toSeconds(30)
