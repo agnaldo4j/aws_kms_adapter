@@ -16,8 +16,6 @@ object KmsAdapterFromEnvironmentVariables {
   def kmsAdapter(): KmsAdapter = {
     KmsAdapter(new AwsCrypto(), provider, executorService)
   }
-
-  def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
 }
 
 object KmsAdapterFromVariables {
@@ -30,7 +28,9 @@ object KmsAdapterFromVariables {
   def kmsAdapter(provider: KmsMasterKeyProvider): KmsAdapter = {
     KmsAdapter(new AwsCrypto(), provider, executorService)
   }
+}
 
+object KmsAdapter {
   def prepareDataPackage(): DataPacket = DataPacket(List[Data]())
 }
 
