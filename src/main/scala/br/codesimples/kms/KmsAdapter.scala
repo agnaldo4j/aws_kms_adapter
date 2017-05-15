@@ -59,8 +59,8 @@ case class KmsAdapter(crypto: AwsCrypto, provider: KmsMasterKeyProvider, executo
 
   private def processFutures(listOfFutures: List[Future[Result]], operation: Operation): List[Result] = {
     listOfFutures.map { future =>
-      if (future.isCancelled) FailResult(operation)
-      else future.get
+      if (future.isDone) future.get()
+      else FailResult(operation)
     }
   }
 

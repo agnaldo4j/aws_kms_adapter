@@ -18,9 +18,9 @@ class KmsAdapterSpec extends Specification {
   }
 
   private def isByEnvironmentVariables: Boolean = {
-    (System.getenv("keyArn") != null) &&
-    (System.getenv("AWS_ACCESS_KEY_ID") != null) &&
-    (System.getenv("AWS_SECRET_KEY") != null)
+    (Option(System.getenv("keyArn")).isDefined) &&
+    (Option(System.getenv("AWS_ACCESS_KEY_ID")).isDefined) &&
+    (Option(System.getenv("AWS_SECRET_KEY")).isDefined)
   }
 
   private def toCryptDataPacket() = {
