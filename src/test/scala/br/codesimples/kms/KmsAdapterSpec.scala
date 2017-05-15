@@ -8,8 +8,13 @@ class KmsAdapterSpec extends Specification {
   sequential
   "The kms adapter showd" should {
     args(sequential=true, isolated=true)
-    "crypt data" ! workerForTest().encryptData()
-    "decrypt data" ! workerForTest().decryptData()
+    if(isByEnvironmentVariables) {
+      "crypt data" ! workerForTest().encryptData()
+      "decrypt data" ! workerForTest().decryptData()
+    } else {
+      "crypt data" ! pending
+      "decrypt data" ! pending
+    }
   }
 
   private def isByEnvironmentVariables: Boolean = {
@@ -38,7 +43,6 @@ class KmsAdapterSpec extends Specification {
 
   case class workerForTest() {
     def encryptData() = {
-      if(isByEnvironmentVariables) pending
       val adapter = KmsAdapterFromEnvironmentVariables.kmsAdapter()
       val result = adapter.encrypt(toCryptDataPacket())
       val listOfValues = result.values
@@ -50,7 +54,6 @@ class KmsAdapterSpec extends Specification {
     }
 
     def decryptData() = {
-      if(isByEnvironmentVariables) pending
       val adapter = KmsAdapterFromEnvironmentVariables.kmsAdapter()
       val result = adapter.decrypt(toDecryptDataPacket())
       val listOfValues = result.values
