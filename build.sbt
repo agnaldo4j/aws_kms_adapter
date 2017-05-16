@@ -1,4 +1,3 @@
-import sbt.Keys.scalaVersion
 import sbt._
 
 name := "aws_kms_adapter"
